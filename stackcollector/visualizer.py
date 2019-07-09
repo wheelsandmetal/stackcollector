@@ -2,6 +2,7 @@ import calendar
 import click
 import dateparser
 from flask import Flask, request, jsonify
+
 from .collector import getdb
 
 

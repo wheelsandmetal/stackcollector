@@ -1,12 +1,13 @@
 import contextlib
-import dbm
-import time
 import click
+# noinspection PyCompatibility
+import dbm
+import logging
 import requests
-from nylas.logging import get_logger, configure_logging
+import time
 
-configure_logging()
-log = get_logger()
+
+_logger = logging.getLogger(__name__)
 
 
 @contextlib.contextmanager
@@ -31,17 +32,18 @@ def collect(dbpath, host, port):
     try:
         resp = requests.get('http://{}:{}?reset=true'.format(host, port))
         resp.raise_for_status()
-    except (requests.ConnectionError, requests.HTTPError) as exc:
-        log.warning('Error collecting data', error=exc, host=host, port=port)
+    # except (requests.ConnectionError, requests.HTTPError):
+    except Exception:
+        _logger.exception('Error collecting data ({}:{})'.format(host, port))
         return
     data = resp.content.splitlines()
+
     try:
         save(data, host, port, dbpath)
-    except Exception as exc:
-        log.warning('Error saving data', error=exc, host=host, port=port)
+    except Exception:
+        _logger.exception('Error saving data ({}:{})'.format(host, port))
         return
-    log.info('Data collected', host=host, port=port,
-             num_stacks=len(data) - 2)
+    _logger.info('Data collected: {}:{}, num_stack: {}'.format(host, port, len(data) - 2))
 
 
 def save(data, host, port, dbpath):

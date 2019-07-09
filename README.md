@@ -36,8 +36,6 @@ The `stackcollector` package adds basic support for automatically collecting and
 sudo mkdir -p /var/lib/stackcollector
 sudo chmod a+rw /var/lib/stackcollector
 
-virtualenv .
-source bin/activate
 python setup.py install
 ```
 
