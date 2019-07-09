@@ -6,28 +6,25 @@ thread too.
 Example usage
 -------------
 Add
->>> gevent.spawn(run_profiler, '0.0.0.0', 16384)
+>>> # noinspection PyUnresolvedReferences
+gevent.spawn(run_profiler, '0.0.0.0', 16384)
 
 in your program to start the profiler, and run the emitter in a new greenlet.
 Then curl localhost:16384 to get a list of stack frames and call counts.
 """
 
-from __future__ import print_function
-import sys
 import atexit
 import collections
+import logging
 import signal
 import time
+# noinspection PyPackageRequirements
 from werkzeug.serving import BaseWSGIServer, WSGIRequestHandler
+# noinspection PyPackageRequirements
 from werkzeug.wrappers import Request, Response
-try:
-    from nylas.logging import get_logger
-    logger = get_logger()
-except ImportError:
-    class _Logger(object):
-        def info(msg):
-            print(msg, file=sys.stderr)
-    logger = _Logger()
+
+
+_logger = logging.getLogger(__name__)
 
 
 class Sampler(object):
@@ -51,6 +48,7 @@ class Sampler(object):
         signal.setitimer(signal.ITIMER_VIRTUAL, self.interval)
         atexit.register(self.stop)
 
+    # noinspection PyUnusedLocal
     def _sample(self, signum, frame):
         stack = []
         while frame is not None:
@@ -61,7 +59,8 @@ class Sampler(object):
         self._stack_counts[stack] += 1
         signal.setitimer(signal.ITIMER_VIRTUAL, self.interval)
 
-    def _format_frame(self, frame):
+    @staticmethod
+    def _format_frame(frame):
         return '{}({})'.format(frame.f_code.co_name,
                                frame.f_globals.get('__name__'))
 
@@ -110,7 +109,7 @@ class Emitter(object):
         server = BaseWSGIServer(self.host, self.port, self.handle_request,
                                 _QuietHandler)
         server.log = lambda *args, **kwargs: None
-        logger.info('Serving profiles on port {}'.format(self.port))
+        _logger.info('Serving profiles on port {}'.format(self.port))
         server.serve_forever()
 
 

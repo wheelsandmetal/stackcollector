@@ -1,21 +1,25 @@
 import contextlib
-import dbm
-import time
 import click
+# noinspection PyCompatibility
+import dbm
+import logging
 import requests
-from nylas.logging import get_logger, configure_logging
+import time
 
-configure_logging()
-log = get_logger()
+
+DEFAULT_STACKCOLLECTOR_DATA_DIR = '/var/cb/data/stackcollector/db'
+
+_logger = logging.getLogger(__name__)
 
 
 @contextlib.contextmanager
 def getdb(dbpath):
+    handle = None
     while True:
         try:
-            handle = dbm.open(dbpath, 'c')
+            handle = dbm.ndbm.open(dbpath, 'c')
             break
-        except dbm.error as exc:
+        except dbm.ndbm.error as exc:
             if exc.args[0] == 11:
                 continue
             else:
@@ -30,17 +34,18 @@ def collect(dbpath, host, port):
     try:
         resp = requests.get('http://{}:{}?reset=true'.format(host, port))
         resp.raise_for_status()
-    except (requests.ConnectionError, requests.HTTPError) as exc:
-        log.warning('Error collecting data', error=exc, host=host, port=port)
+    # except (requests.ConnectionError, requests.HTTPError):
+    except Exception:
+        _logger.exception('Error collecting data ({}:{})'.format(host, port))
         return
     data = resp.content.splitlines()
+
     try:
         save(data, host, port, dbpath)
-    except Exception as exc:
-        log.warning('Error saving data', error=exc, host=host, port=port)
+    except Exception:
+        _logger.exception('Error saving data ({}:{})'.format(host, port))
         return
-    log.info('Data collected', host=host, port=port,
-             num_stacks=len(data) - 2)
+    _logger.info('Data collected: {}:{}, num_stack: {}'.format(host, port, len(data) - 2))
 
 
 def save(data, host, port, dbpath):
@@ -60,7 +65,7 @@ def save(data, host, port, dbpath):
 
 
 @click.command()
-@click.option('--dbpath', '-d', default='/var/lib/stackcollector/db')
+@click.option('--dbpath', '-d', default=DEFAULT_STACKCOLLECTOR_DATA_DIR)
 @click.option('--host', '-h', multiple=True)
 @click.option('--ports', '-p')
 @click.option('--interval', '-i', type=int, default=600)
@@ -70,7 +75,7 @@ def run(dbpath, host, ports, interval):
         start, end = ports.split('..')
         start = int(start)
         end = int(end)
-        ports = range(start, end + 1)
+        ports = list(range(start, end + 1))
     elif ',' in ports:
         ports = [int(p) for p in ports.split(',')]
     else:
