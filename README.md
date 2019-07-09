@@ -1,5 +1,7 @@
 This is a collection of minimalist utilities for profiling Python programs. The motivation behind them is described in our [blog post](https://www.nylas.com/blog/performance).
 
+**Note**: This project was forked from [nylas-perftools](https://github.com/nylas/nylas-perftools) and ported to Python 3.
+
 
 # py2devtools
 The profile visualizer that's built into the Chrome developer tools is pretty rad. `py2devtools.py` contains instrumentation to create a `.cpuprofile` file from a Python program that can be loaded into the developer tools. See the module docstring for details.
@@ -55,7 +57,3 @@ python -m stackcollector.visualizer --port 5555
 ```
 
 Then visit e.g. `http://localhost:5555?from=-15minutes` to see data from the past 15 minutes.
-
-# Questions? Issues?
-
-Don't hesitate to get in touch!
