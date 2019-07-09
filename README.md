@@ -35,8 +35,8 @@ The `stackcollector` package adds basic support for automatically collecting and
 
 ```
 # create a directory for data files
-sudo mkdir -p /var/lib/stackcollector
-sudo chmod a+rw /var/lib/stackcollector
+sudo mkdir -p /var/cb/data/stackcollector
+sudo chmod a+rw /var/cb/data/stackcollector
 
 python setup.py install
 ```
@@ -53,7 +53,7 @@ python -m stackcollector.collector --host localhost --ports 16384 --interval 60
 ## Running the visualizer
 
 ```
-python -m stackcollector.visualizer --port 5555
+python -m stackcollector.visualizer --port 9999
 ```
 
-Then visit e.g. `http://localhost:5555?from=-15minutes` to see data from the past 15 minutes.
+Then visit e.g. `http://localhost:9999?from=-15minutes` to see data from the past 15 minutes.

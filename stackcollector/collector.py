@@ -7,6 +7,8 @@ import requests
 import time
 
 
+DEFAULT_STACKCOLLECTOR_DATA_DIR = '/var/cb/data/stackcollector/db'
+
 _logger = logging.getLogger(__name__)
 
 
@@ -63,7 +65,7 @@ def save(data, host, port, dbpath):
 
 
 @click.command()
-@click.option('--dbpath', '-d', default='/var/lib/stackcollector/db')
+@click.option('--dbpath', '-d', default=DEFAULT_STACKCOLLECTOR_DATA_DIR)
 @click.option('--host', '-h', multiple=True)
 @click.option('--ports', '-p')
 @click.option('--interval', '-i', type=int, default=600)
