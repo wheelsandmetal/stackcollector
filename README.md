@@ -3,7 +3,7 @@ This is a collection of minimalist utilities for profiling Python programs. The 
 **Note**: This project was forked from [nylas-perftools](https://github.com/nylas/nylas-perftools) and ported to Python 3.
 
 
-# py2devtools
+# devtools
 The profile visualizer that's built into the Chrome developer tools is pretty rad. `py2devtools.py` contains instrumentation to create a `.cpuprofile` file from a Python program that can be loaded into the developer tools. See the module docstring for details.
 
 
@@ -12,7 +12,7 @@ The profile visualizer that's built into the Chrome developer tools is pretty ra
 `stacksampler.py` contains a sampling profiler, along with a minimal embedded HTTP server to expose its data. It's built to work with [gevented](https://github.com/gevent/gevent) applications, but can be adapted to work without. Assuming gevent, drop
 
 ```
-import stacksampler
+from stackcollector import stacksampler
 gevent.spawn(stacksampler.run_profiler)
 ```
 
