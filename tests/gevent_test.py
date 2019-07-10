@@ -4,7 +4,8 @@ adapted from https://sdiehl.github.io/gevent-tutorial/
 
 import gevent
 from gevent import Greenlet
-import stacksampler
+from stackcollector import stacksampler
+
 gevent.spawn(stacksampler.run_profiler)
 
 

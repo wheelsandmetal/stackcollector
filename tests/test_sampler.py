@@ -1,5 +1,5 @@
 import time
-from stacksampler import Sampler
+from stackcollector.stacksampler import Sampler
 
 
 def slp():
