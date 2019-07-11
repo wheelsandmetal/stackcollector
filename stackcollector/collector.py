@@ -7,7 +7,7 @@ import requests
 import time
 
 
-DEFAULT_STACKCOLLECTOR_DATA_DIR = '/var/cb/data/stackcollector/db'
+DEFAULT_STACKCOLLECTOR_DATA_DIR = '/var/cb/data/stackcollector'
 
 _logger = logging.getLogger(__name__)
 
@@ -53,15 +53,19 @@ def save(data, host, port, dbpath):
     with getdb(dbpath) as db:
         for line in data[2:]:
             try:
+                line = line.decode('utf-8')
                 stack, value = line.split()
             except ValueError:
                 continue
 
-            entry = '{}:{}:{}:{} '.format(host, port, now, value)
-            if stack in db:
-                db[stack] += entry
-            else:
-                db[stack] = entry
+            try:
+                entry = '{}:{}:{}:{} '.format(host, port, now, value).encode('utf-8')
+                if stack in db:
+                    db[stack] += entry
+                else:
+                    db[stack] = entry
+            except Exception:
+                _logger.exception("Error saving data")
 
 
 @click.command()

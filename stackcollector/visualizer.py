@@ -2,9 +2,11 @@ import calendar
 import click
 import dateparser
 from flask import Flask, request, jsonify
+import logging
 
-from .collector import getdb
+from .collector import getdb, DEFAULT_STACKCOLLECTOR_DATA_DIR
 
+_logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
@@ -66,20 +68,26 @@ def data():
         until = _parse_relative_date(until)
     threshold = float(request.args.get('threshold', 0))
     root = Node('root')
+
     with getdb(app.config['DBPATH']) as db:
         keys = list(db.keys())
         for k in keys:
             entries = db[k].split()
             value = 0
             for e in entries:
-                host, port, ts, v = e.split(':')
-                ts = int(ts)
-                v = int(v)
-                if ((from_ is None or ts >= from_) and
-                        (until is None or ts <= until)):
-                    value += v
-            frames = k.split(';')
+                try:
+                    e = e.decode('utf-8')
+                    host, port, ts, v = e.split(':')
+                    ts = int(ts)
+                    v = int(v)
+                    if ((from_ is None or ts >= from_) and
+                            (until is None or ts <= until)):
+                        value += v
+                except ValueError as ex:
+                    continue
+            frames = k.decode('utf-8').split(';')
             root.add(frames, value)
+
     return jsonify(root.serialize(threshold * root.value))
 
 
@@ -90,7 +98,7 @@ def render():
 
 @click.command()
 @click.option('--port', type=int, default=9999)
-@click.option('--dbpath', '-d', default='/var/lib/stackcollector/db')
+@click.option('--dbpath', '-d', default=DEFAULT_STACKCOLLECTOR_DATA_DIR)
 def run(port, dbpath):
     app.config['DBPATH'] = dbpath
     app.run(host='0.0.0.0', port=port)
