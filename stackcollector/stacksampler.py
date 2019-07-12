@@ -23,6 +23,8 @@ from werkzeug.serving import BaseWSGIServer, WSGIRequestHandler
 # noinspection PyPackageRequirements
 from werkzeug.wrappers import Request, Response
 
+DEFAULT_HOST = "0.0.0.0"
+DEFAULT_PORT = 16384
 
 _logger = logging.getLogger(__name__)
 
@@ -119,7 +121,7 @@ class _QuietHandler(WSGIRequestHandler):
         pass
 
 
-def run_profiler(host='0.0.0.0', port=16384):
+def run_profiler(host=DEFAULT_HOST, port=DEFAULT_PORT):
     sampler = Sampler()
     sampler.start()
     e = Emitter(sampler, host, port)

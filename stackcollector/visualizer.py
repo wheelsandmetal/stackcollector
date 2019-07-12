@@ -6,6 +6,9 @@ import logging
 
 from .collector import getdb, DEFAULT_STACKCOLLECTOR_DATA_DIR
 
+DEFAULT_HOST = "0.0.0.0"
+DEFAULT_PORT = 9999
+
 _logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
@@ -97,11 +100,12 @@ def render():
 
 
 @click.command()
-@click.option('--port', type=int, default=9999)
+@click.option('--port', type=int, default=DEFAULT_PORT)
 @click.option('--dbpath', '-d', default=DEFAULT_STACKCOLLECTOR_DATA_DIR)
 def run(port, dbpath):
+    print("*** Visualizer running at {}:{} , reading data from {} ***".format(DEFAULT_HOST, port, dbpath))
     app.config['DBPATH'] = dbpath
-    app.run(host='0.0.0.0', port=port)
+    app.run(host=DEFAULT_HOST, port=port)
 
 
 if __name__ == '__main__':
