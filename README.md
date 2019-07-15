@@ -31,6 +31,13 @@ to get profiling data. See the module docstring for more details.
 
 The `stackcollector` package adds basic support for automatically collecting and visualizing profiles from distributed processes. It has two parts: a long-running collector agent that periodically gets samples from processes, and a frontend that serves visualizations. Data is timestamped and persisted using gdbm, allowing for time-based querying.
 
+## Building
+
+```
+pip install setuptools wheel twine
+python3 setup.py sdist bdist_wheel
+```
+
 ## Installation
 
 ```
