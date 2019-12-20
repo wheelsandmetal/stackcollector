@@ -1,0 +1,7 @@
+setuptools
+click
+dateparser
+flask
+werkzeug
+gevent
+nose

@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='cb-stackcollector',
+    name='stackcollector',
     version='0.4',
     packages=find_packages(),
     include_package_data=True,
